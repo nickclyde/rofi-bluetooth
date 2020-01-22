@@ -21,7 +21,7 @@
 [module/bluetooth]
 type = custom/script
 exec = rofi-bluetooth --status
-interval = 2
+interval = 1
 click-left = rofi-bluetooth &
 ```
 
