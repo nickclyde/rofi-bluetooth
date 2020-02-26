@@ -8,9 +8,12 @@
 
 ## Installation
 
+Install from [AUR (rofi-bluetooth-git)](https://aur.archlinux.org/packages/rofi-bluetooth-git/), or:
+
 1. Install dependencies: [rofi](https://github.com/davatorium/rofi) and bluetoothctl (provided by `bluez-utils` in Arch)
 1. `git clone git@github.com:ClydeDroid/rofi-bluetooth.git`
-1. `cd rofi-bluetooth && ./rofi-bluetooth`
+1. `cd rofi-bluetooth`
+1. `./rofi-bluetooth`
 1. (Optional) For easy access, add the script somewhere in your `$PATH`.
 
 ### Polybar configuration
