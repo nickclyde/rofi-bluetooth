@@ -29,8 +29,10 @@ power_on() {
 toggle_power() {
     if power_on; then
         bluetoothctl power off
+        show_menu
     else
         bluetoothctl power on
+        show_menu
     fi
 }
 
@@ -50,8 +52,12 @@ toggle_scan() {
     if scan_on; then
         kill $(pgrep -f "bluetoothctl scan on")
         bluetoothctl scan off
+        show_menu
     else
         bluetoothctl scan on &
+        echo "Scanning..."
+        sleep 5
+        show_menu
     fi
 }
 
@@ -70,8 +76,10 @@ pairable_on() {
 toggle_pairable() {
     if pairable_on; then
         bluetoothctl pairable off
+        show_menu
     else
         bluetoothctl pairable on
+        show_menu
     fi
 }
 
@@ -90,8 +98,10 @@ discoverable_on() {
 toggle_discoverable() {
     if discoverable_on; then
         bluetoothctl discoverable off
+        show_menu
     else
         bluetoothctl discoverable on
+        show_menu
     fi
 }
 
@@ -109,8 +119,10 @@ device_connected() {
 toggle_connection() {
     if device_connected $1; then
         bluetoothctl disconnect $1
+        show_menu
     else
         bluetoothctl connect $1
+        show_menu
     fi
 }
 
@@ -130,8 +142,10 @@ device_paired() {
 toggle_paired() {
     if device_paired $1; then
         bluetoothctl remove $1
+        show_menu
     else
         bluetoothctl pair $1
+        show_menu
     fi
 }
 
@@ -151,8 +165,10 @@ device_trusted() {
 toggle_trust() {
     if device_trusted $1; then
         bluetoothctl untrust $1
+        show_menu
     else
         bluetoothctl trust $1
+        show_menu
     fi
 }
 
@@ -242,10 +258,10 @@ show_menu() {
         divider="---------"
 
         # Options passed to rofi
-        options="$devices\n$divider\n$power\n$scan\n$pairable\n$discoverable"
+        options="$devices\n$divider\n$power\n$scan\n$pairable\n$discoverable\nExit"
     else
         power="Power: off"
-        options="$power"
+        options="$power\nExit"
     fi
 
     # Open rofi menu, read chosen option
