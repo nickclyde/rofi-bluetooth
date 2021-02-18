@@ -16,6 +16,10 @@
 # Depends on:
 #   Arch repositories: rofi, bluez-utils (contains bluetoothctl)
 
+# Constants
+divider="---------"
+goback="Back"
+
 # Checks if bluetooth controller is powered on
 power_on() {
     if bluetoothctl show | grep -q "Powered: yes"; then
@@ -122,10 +126,10 @@ device_connected() {
 toggle_connection() {
     if device_connected $1; then
         bluetoothctl disconnect $1
-        show_menu
+        device_menu "$device"
     else
         bluetoothctl connect $1
-        show_menu
+        device_menu "$device"
     fi
 }
 
@@ -145,10 +149,10 @@ device_paired() {
 toggle_paired() {
     if device_paired $1; then
         bluetoothctl remove $1
-        show_menu
+        device_menu "$device"
     else
         bluetoothctl pair $1
-        show_menu
+        device_menu "$device"
     fi
 }
 
@@ -168,10 +172,10 @@ device_trusted() {
 toggle_trust() {
     if device_trusted $1; then
         bluetoothctl untrust $1
-        show_menu
+        device_menu "$device"
     else
         bluetoothctl trust $1
-        show_menu
+        device_menu "$device"
     fi
 }
 
@@ -222,14 +226,14 @@ device_menu() {
     fi
     paired=$(device_paired $mac)
     trusted=$(device_trusted $mac)
-    options="$connected\n$paired\n$trusted"
+    options="$connected\n$paired\n$trusted\n$divider\n$goback\nExit"
 
     # Open rofi menu, read chosen option
     chosen="$(echo -e "$options" | $rofi_command "$device_name")"
 
     # Match chosen option to command
     case $chosen in
-        "")
+        "" | $divider)
             echo "No option chosen."
             ;;
         $connected)
@@ -240,6 +244,9 @@ device_menu() {
             ;;
         $trusted)
             toggle_trust $mac
+            ;;
+        $goback)
+            show_menu
             ;;
     esac
 }
@@ -258,7 +265,6 @@ show_menu() {
         scan=$(scan_on)
         pairable=$(pairable_on)
         discoverable=$(discoverable_on)
-        divider="---------"
 
         # Options passed to rofi
         options="$devices\n$divider\n$power\n$scan\n$pairable\n$discoverable\nExit"
