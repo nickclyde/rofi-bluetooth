@@ -199,6 +199,10 @@ print_status() {
                 ((counter++))
             fi
         done
+
+        if [ $counter -eq 0 ]; then
+          echo "No Connections"
+        fi
         printf "\n"
     else
         echo "Power Off"
