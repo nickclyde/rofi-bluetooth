@@ -183,7 +183,7 @@ toggle_trust() {
 # Useful for status bars like polybar, etc.
 print_status() {
     if power_on; then
-        printf ''
+        printf ''
 
         mapfile -t paired_devices < <(bluetoothctl paired-devices | grep Device | cut -d ' ' -f 2)
         counter=0
@@ -203,7 +203,7 @@ print_status() {
         done
         printf "\n"
     else
-        echo ""
+        echo ""
     fi
 }
 
@@ -299,7 +299,7 @@ show_menu() {
 }
 
 # Rofi command to pipe into, can add any options here
-rofi_command="rofi -dmenu -no-fixed-num-lines -yoffset -100 -i -p $@"
+rofi_command="rofi -dmenu -no-fixed-num-lines -yoffset -100 -i $@"
 
 case "$1" in
     --status)
