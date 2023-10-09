@@ -179,13 +179,23 @@ toggle_trust() {
     fi
 }
 
+# Backwards-compatible function to print paired devices.
+paired_devices() {
+    if [ -n "$(bluetoothctl version | cut -d ' ' -f 2 | awk -F. '($1 > 5 || $1 == 5 && $2 > 64)')" ]; then
+        bluetoothctl devices Paired
+    else
+        bluetoothctl paired-devices
+    fi
+}
+
+
 # Prints a short string with the current bluetooth status
 # Useful for status bars like polybar, etc.
 print_status() {
     if power_on; then
         printf ''
         sep=""
-        bluetoothctl devices Paired | grep Device | cut -d ' ' -f 2 |
+        paired_devices | grep Device | cut -d ' ' -f 2 |
         while IFS= read -r device; do
             if device_connected "$device"; then
                 device_alias=$(bluetoothctl info "$device" | grep "Alias" | cut -d ' ' -f 2-)
