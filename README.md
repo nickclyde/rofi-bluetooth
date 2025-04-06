@@ -10,7 +10,7 @@
 
 Install from [AUR (rofi-bluetooth-git)](https://aur.archlinux.org/packages/rofi-bluetooth-git/), or:
 
-1. Install dependencies: [rofi](https://github.com/davatorium/rofi) and bluetoothctl (provided by `bluez-utils` in Arch)
+1. Install dependencies: [rofi](https://github.com/davatorium/rofi), bluetoothctl (provided by `bluez-utils` in Arch) and [bc](https://archlinux.org/packages/extra/x86_64/bc/)
 1. `git clone git@github.com:ClydeDroid/rofi-bluetooth.git`
 1. `cd rofi-bluetooth`
 1. `./rofi-bluetooth`
@@ -28,10 +28,29 @@ interval = 1
 click-left = rofi-bluetooth &
 ```
 
+### Waybar configuration
+
+"bluetooth": {
+	// "controller": "controller1", // specify the alias of the controller if there are more than 1 on the system
+	"format": " {status}",
+	"format-disabled": "", // an empty format will hide the module
+	"format-connected": " {num_connections} connected",
+	"tooltip-format": "{controller_alias}\t{controller_address}",
+	"tooltip-format-connected": "{controller_alias}\t{controller_address}\n\n{device_enumerate}",
+	"tooltip-format-enumerate-connected": "{device_alias}\t{device_address}",
+	"on-click": "rofi-bluetooth"
+},
+
 ### i3 keybinding
 
 ```
 bindsym $mod+b exec --no-startup-id rofi-bluetooth
+```
+
+### Hyprland keybinding
+
+```
+bind = $mainMod, B, exec, rofi-bluetooth
 ```
 
 ### Thanks for the inspiration!
