@@ -178,32 +178,28 @@ toggle_trust() {
     fi
 }
 
+# Backwards-compatible function to print paired devices.
+paired_devices() {
+    if [ -n "$(bluetoothctl version | cut -d ' ' -f 2 | awk -F. '($1 > 5 || $1 == 5 && $2 > 64)')" ]; then
+        bluetoothctl devices Paired
+    else
+        bluetoothctl paired-devices
+    fi
+}
+
+
 # Prints a short string with the current bluetooth status
 # Useful for status bars like polybar, etc.
 print_status() {
     if power_on; then
         printf ''
-
-        paired_devices_cmd="devices Paired"
-        # Check if an outdated version of bluetoothctl is used to preserve backwards compatibility
-        if (( $(echo "$(bluetoothctl version | cut -d ' ' -f 2) < 5.65" | bc -l) )); then
-            paired_devices_cmd="paired-devices"
-        fi
-
-        mapfile -t paired_devices < <(bluetoothctl $paired_devices_cmd | grep Device | cut -d ' ' -f 2)
-        counter=0
-
-        for device in "${paired_devices[@]}"; do
+        sep=""
+        paired_devices | grep Device | cut -d ' ' -f 2 |
+        while IFS= read -r device; do
             if device_connected "$device"; then
                 device_alias=$(bluetoothctl info "$device" | grep "Alias" | cut -d ' ' -f 2-)
-
-                if [ $counter -gt 0 ]; then
-                    printf ", %s" "$device_alias"
-                else
-                    printf " %s" "$device_alias"
-                fi
-
-                ((counter++))
+                printf "$sep %s" "$device_alias"
+                sep=","
             fi
         done
         printf "\n"
@@ -298,7 +294,7 @@ show_menu() {
         *)
             device=$(bluetoothctl devices | grep "$chosen")
             # Open a submenu if a device is selected
-            if [[ $device ]]; then device_menu "$device"; fi
+            if [ "$device" ]; then device_menu "$device"; fi
             ;;
     esac
 }
