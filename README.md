@@ -30,6 +30,7 @@ click-left = rofi-bluetooth &
 
 ### Waybar configuration
 
+```
 "bluetooth": {
 	// "controller": "controller1", // specify the alias of the controller if there are more than 1 on the system
 	"format": " {status}",
@@ -40,6 +41,7 @@ click-left = rofi-bluetooth &
 	"tooltip-format-enumerate-connected": "{device_alias}\t{device_address}",
 	"on-click": "rofi-bluetooth"
 },
+```
 
 ### i3 keybinding
 
