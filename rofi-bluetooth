@@ -7,14 +7,14 @@
 #
 # Author: Nick Clyde (clydedroid)
 #
-# A script that generates a rofi menu that uses bluetoothctl to
+# A script that generates a menu that uses bluetoothctl to
 # connect to bluetooth devices and display status info.
 #
 # Inspired by networkmanager-dmenu (https://github.com/firecat53/networkmanager-dmenu)
 # Thanks to x70b1 (https://github.com/polybar/polybar-scripts/tree/master/polybar-scripts/system-bluetooth-bluetoothctl)
 #
 # Depends on:
-#   Arch repositories: rofi, bluez-utils (contains bluetoothctl), bc
+#   Arch repositories: rofi (or alternative) , bluez-utils (contains bluetoothctl), bc
 
 # Constants
 divider="---------"
@@ -230,8 +230,8 @@ device_menu() {
     trusted=$(device_trusted "$mac")
     options="$connected\n$paired\n$trusted\n$divider\n$goback\nExit"
 
-    # Open rofi menu, read chosen option
-    chosen="$(echo -e "$options" | $rofi_command "$device_name")"
+    # Open menu, read chosen option
+    chosen="$(echo -e "$options" | $launcher "$device_name")"
 
     # Match chosen option to command
     case "$chosen" in
@@ -253,7 +253,7 @@ device_menu() {
     esac
 }
 
-# Opens a rofi menu with current bluetooth status and options to connect
+# Opens a menu with current bluetooth status and options to connect
 show_menu() {
     # Get menu options
     if power_on; then
@@ -268,15 +268,15 @@ show_menu() {
         pairable=$(pairable_on)
         discoverable=$(discoverable_on)
 
-        # Options passed to rofi
+        # Options passed to menu
         options="$devices\n$divider\n$power\n$scan\n$pairable\n$discoverable\nExit"
     else
         power="Power: off"
         options="$power\nExit"
     fi
 
-    # Open rofi menu, read chosen option
-    chosen="$(echo -e "$options" | $rofi_command "Bluetooth")"
+    # Open menu, read chosen option
+    chosen="$(echo -e "$options" | $launcher "Bluetooth")"
 
     # Match chosen option to command
     case "$chosen" in
@@ -303,14 +303,22 @@ show_menu() {
     esac
 }
 
-# Rofi command to pipe into, can add any options here
-rofi_command="rofi -dmenu $* -p"
+# Launcher command to pipe into, can add any options here
+launcher="rofi -dmenu $* -p"
 
-case "$1" in
-    --status)
-        print_status
-        ;;
-    *)
-        show_menu
-        ;;
-esac
+
+while [ -n "$1" ]; do
+	case "$1" in
+		'--status') print_status ; exit;;
+		'--rofi') launcher='rofi -dmenu $* -p' ;;
+		'--walker') launcher='walker --dmenu -k --placeholder' ;;
+		'--custom')
+			launcher="$2"
+			shift
+			;;
+		*) echo "$program_name: Wrong option given. See usage with -h or --help." >&2 ; exit 1 ;;
+	esac
+	shift
+done
+
+show_menu
