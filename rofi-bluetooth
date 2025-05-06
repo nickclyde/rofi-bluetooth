@@ -46,10 +46,10 @@ toggle_power() {
 # Checks if controller is scanning for new devices
 scan_on() {
     if bluetoothctl show | grep -q "Discovering: yes"; then
-        echo "Scan: on"
+        echo $scan_on
         return 0
     else
-        echo "Scan: off"
+        echo $scan_off
         return 1
     fi
 }
@@ -70,10 +70,10 @@ toggle_scan() {
 # Checks if controller is able to pair to devices
 pairable_on() {
     if bluetoothctl show | grep -q "Pairable: yes"; then
-        echo "Pairable: on"
+        echo $pairable_on
         return 0
     else
-        echo "Pairable: off"
+        echo $pairable_off
         return 1
     fi
 }
@@ -92,10 +92,10 @@ toggle_pairable() {
 # Checks if controller is discoverable by other devices
 discoverable_on() {
     if bluetoothctl show | grep -q "Discoverable: yes"; then
-        echo "Discoverable: on"
+        echo $discoverable_on
         return 0
     else
-        echo "Discoverable: off"
+        echo $discoverable_off
         return 1
     fi
 }
@@ -136,10 +136,10 @@ toggle_connection() {
 device_paired() {
     device_info=$(bluetoothctl info "$1")
     if echo "$device_info" | grep -q "Paired: yes"; then
-        echo "Paired: yes"
+        echo $paired_yes
         return 0
     else
-        echo "Paired: no"
+        echo $paired_no
         return 1
     fi
 }
@@ -159,10 +159,10 @@ toggle_paired() {
 device_trusted() {
     device_info=$(bluetoothctl info "$1")
     if echo "$device_info" | grep -q "Trusted: yes"; then
-        echo "Trusted: yes"
+        echo $trusted_yes
         return 0
     else
-        echo "Trusted: no"
+        echo $trusted_no
         return 1
     fi
 }
@@ -222,9 +222,9 @@ device_menu() {
 
     # Build options
     if device_connected "$mac"; then
-        connected="Connected: yes"
+        connected=$connected_yes
     else
-        connected="Connected: no"
+        connected=$connected_no
     fi
     paired=$(device_paired "$mac")
     trusted=$(device_trusted "$mac")
@@ -257,7 +257,7 @@ device_menu() {
 show_menu() {
     # Get menu options
     if power_on; then
-        power="Power: on"
+        power=$power_on
 
         # Human-readable names of devices, one per line
         # If scan is off, will only list paired devices
@@ -271,7 +271,7 @@ show_menu() {
         # Options passed to rofi
         options="$devices\n$divider\n$power\n$scan\n$pairable\n$discoverable\nExit"
     else
-        power="Power: off"
+        power=$power_off
         options="$power\nExit"
     fi
 
@@ -306,11 +306,46 @@ show_menu() {
 # Rofi command to pipe into, can add any options here
 rofi_command="rofi -dmenu $* -p"
 
-case "$1" in
-    --status)
-        print_status
-        ;;
-    *)
-        show_menu
-        ;;
-esac
+
+while [ -n "$1" ]; do
+	case "$1" in
+		'--status') print_status ; exit;;
+		'--icons') icons='true' ;;
+		*) echo "$program_name: Wrong option given. See usage with -h or --help." >&2 ; exit 1 ;;
+	esac
+	shift
+done
+
+power_on="Power: on"
+power_off="Power: off"
+connected_yes="Connected: yes"
+connected_no="Connected: no"
+discoverable_on="Discoverable: on"
+discoverable_off="Discoverable: off"
+pairable_on="Pairable: on"
+pairable_off="Pairable: off"
+paired_yes="Paired: yes"
+paired_no="Paired: no"
+trusted_yes="Trusted: yes"
+trusted_no="Trusted: no"
+scan_on="Scan: on"
+scan_off="Scan: off"
+if [ $icons ]
+then
+    power_on="Power: 󰂯 "
+    power_off="Power: 󰂲 "
+    connected_yes="Connected: 󰂱 "
+    connected_no="Connected:  "
+    discoverable_on="Discoverable: 󰛐 "
+    discoverable_off="Discoverable: 󰛑 "
+    pairable_on="Pairable: 󰲔 "
+    pairable_off="Pairable: 󰌸 "
+    paired_yes="Paired: 󰌷 "
+    paired_no="Paired: 󰌸 "
+    trusted_yes="Trusted:  "
+    trusted_no="Trusted:  "
+    scan_on="Scan:  "
+    scan_off="Scan:  "
+fi
+
+show_menu
